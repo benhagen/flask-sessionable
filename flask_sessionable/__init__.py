@@ -24,6 +24,8 @@ from operator import xor
 from itertools import izip, starmap
 
 
+DEFAULT_SESSION_REFRESH = 60 * 60
+
 _pack_int = Struct('>I').pack
 
 
@@ -37,6 +39,8 @@ class session(CallbackDict, SessionMixin):
 		def on_update(self):
 			self.modified = True
 		self.app = app
+		if "SESSION_REFRESH" not in self.app.config:
+			self.app.config['SESSION_REFRESH'] = DEFAULT_SESSION_REFRESH
 		# Set a callback to catch future modifications
 		CallbackDict.__init__(self, initial, on_update)
 		# If there is no session yet, seed it first
@@ -74,6 +78,17 @@ class session(CallbackDict, SessionMixin):
 		self['_start'] = arrow.utcnow()
 		# Kick off a first refresh
 		self.refresh()
+
+	def dict(self):
+		output = dict(self)
+		return output
+
+	def debug(self):
+		output = self.dict()
+		output['_start'] = output['_start'].timestamp
+		output['_refresh'] = output['_refresh'].timestamp
+		output = json.dumps(output, indent=4, sort_keys=True)
+		return output
 
 
 class session_interface(SessionInterface):
