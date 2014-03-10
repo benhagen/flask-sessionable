@@ -38,3 +38,6 @@ if __name__ == "__main__":
 	app.run(use_reloader=True)
 
 ```
+
+## External Reading
+* https://github.com/blog/1661-modeling-your-app-s-user-session
